@@ -1,0 +1,4 @@
+pcre-8.36
+./configure --enable-jit --enable-utf8 --enable-unicode-properties
+
+

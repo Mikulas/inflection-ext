@@ -1,8 +1,8 @@
 #include <phpcpp.h>
+#include <iostream>
+#include <string>
+#include <pcrecpp.h>
 
-/**
- *  Inflection class that can be used for counting
- */
 class Inflection : public Php::Base
 {
 private:
@@ -13,22 +13,34 @@ private:
     int _value = 0;
 
 public:
-    /**
-     *  C++ constructor and destructor
-     */
     Inflection() {}
     virtual ~Inflection() {}
     
+    /**
+     * @param string    $phrase
+     * @param NULL|bool $animate
+     */
     Php::Value inflect(Php::Parameters &params)
     {
+        string phrase = params[0];
+        
+        int i;
+        string s;
+       
+        pcrecpp::RE re("(\\w+):(\\d+)");
+        if (re.error().length() > 0) {
+            Php::out << "PCRE compilation failed with error: " << re.error() << "\n";
+        }
+        if (re.PartialMatch(phrase, &s, &i))
+        Php::out << "re match: " << s << " : " << i << "\n";
+
+        Php::out << phrase << std::endl;
+
         return ++_value;
     }
     
 };
 
-/**
- *  tell the compiler that the get_module is a pure C function
- */
 extern "C" {
     
     /**
@@ -44,17 +56,14 @@ extern "C" {
         // for the entire duration of the process (that's why it's static)
         static Php::Extension extension("inflection", "1.0");
         
-        // description of the class so that PHP knows which methods are accessible
         Php::Class<Inflection> inflection("Inflection");
         inflection.method("inflect", &Inflection::inflect, { 
             Php::ByVal("phrase", Php::Type::String, true),
             Php::ByVal("animate", Php::Type::Bool, false)
         });
 
-        // add the class to the extension
         extension.add(std::move(inflection));
         
-        // return the extension
         return extension;
     }
 }
