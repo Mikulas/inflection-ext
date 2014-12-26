@@ -657,7 +657,6 @@ public:
 
         for (auto &word : words)
         {
-            Php::out << "Matching word: " << word << "\n";
             std::string full;
             std::string glyph[3];
             bool useException = false;
@@ -699,7 +698,6 @@ public:
                     std::vector<std::string> inflectedWord {word};
                     inflectedWord.insert(inflectedWord.end(), entry.cases, entry.cases + sizeof(entry.cases) / sizeof(entry.cases[0]));
                     inflected.push_back(inflectedWord);
-                    Php::out << "matched word on dictionary: " << word << " -> " << entry.cases[5] << "\n";
 
                     if (gender == Gender::ignore)
                     {
@@ -746,8 +744,6 @@ public:
                 }
                 if (found)
                 {
-                    Php::out << "matched word on regex: " << word << " -> " << entry.patern.cases[5] << "\n";
-
                     std::vector<std::string> inflectedWord;
                     inflectedWord.push_back(word);
 
@@ -800,7 +796,7 @@ public:
             }
 
             nextWord:
-            Php::out.flush();
+            continue;
         }
 
         Php::Value result;
@@ -824,26 +820,6 @@ public:
         }
 
         return result;
-
-
-//        std::string phrase = params[0];
-//
-//        Php::out << "matching on '" << phrase << ">>>" << phrase.substr(1, 2) << "'\n";
-//
-//        pcrecpp::RE_Options opt(PCRE_UTF8);
-//        pcrecpp::RE re("(.)ka$", opt);
-//        if (re.error().length() > 0) {
-//            Php::out << "PCRE compilation failed with error: " << re.error() << "\n";
-//        }
-//
-//        if (re.PartialMatch(phrase, &glyph)) {
-//            Php::out << "re match: " << glyph << "\n";
-//        } else {
-//            Php::out << "\033[31;mre not matched\033[m\n";
-//        }
-//
-//        Php::out.flush();
-//        return ++_value;
     }
     
 };
