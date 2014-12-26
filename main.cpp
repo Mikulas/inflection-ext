@@ -19,6 +19,13 @@ struct RegexPattern
     Pattern patern;
 };
 
+struct Exception
+{
+    std::string nominative;
+    std::string stem;
+    std::string accusative;
+};
+
 class Inflection : public Php::Base
 {
 private:
@@ -456,6 +463,52 @@ private:
         "zvíře",
     };
 
+    const Exception exceptions[44] = {
+        {"bořek", "bořk", "bořka"},
+        {"bořek", "bořk", "bořka"},
+        {"chleba", "chleb", "chleba"},
+        {"chléb", "chleb", "chleba"},
+        {"cyklus", "cykl", "cyklus"},
+        {"dvůr", "dvor", "dvůr"},
+        {"déšť", "dešť", "déšť"},
+        {"důl", "dol", "důl"},
+        {"havel", "havl", "havla"},
+        {"hnůj", "hnoj", "hnůj"},
+        {"hůl", "hole", "hůl"},
+        {"karel", "karl", "karla"},
+        {"kel", "kl", "kel"},
+        {"kotel", "kotl", "kotel"},
+        {"kůň", "koň", "koně"},
+        {"luděk", "luďk", "luďka"},
+        {"líh", "lih", "líh"},
+        {"mráz", "mraz", "mráz"},
+        {"myš", "myše", "myš"},
+        {"nehet", "neht", "nehet"},
+        {"ocet", "oct", "octa"},
+        {"osel", "osl", "osla"},
+        {"pavel", "pavl", "pavla"},
+        {"pes", "ps", "psa"},
+        {"peň", "pň", "peň"},
+        {"posel", "posl", "posla"},
+        {"prsten", "prstýnek", "prstýnku"},
+        {"pytel", "pytl", "pytel"},
+        {"půl", "půle", "půli"},
+        {"skrýš", "skrýše", "skrýš"},
+        {"smrt", "smrť", "smrt"},
+        {"sníh", "sněh", "sníh"},
+        {"sopel", "sopl", "sopel"},
+        {"stupeň", "stupň", "stupeň"},
+        {"stůl", "stol", "stůl"},
+        {"svatozář", "svatozáře", "svatozář"},
+        {"sůl", "sole", "sůl"},
+        {"tůň", "tůňe", "tůň"},
+        {"účet", "účt", "účet"},
+        {"veš", "vš", "veš"},
+        {"vítr", "větr", "vítr"},
+        {"vůl", "vol", "vola"},
+        {"zeď", "zď", "zeď"},
+        {"zář", "záře", "zář"},
+    };
 
     std::vector<RegexPattern> regexes;
     std::vector<Pattern> dictionary;
@@ -521,6 +574,8 @@ public:
             Php::out << "Matching word: " << word << "\n";
             std::string full;
             std::string glyph[3];
+            bool useException = false;
+            Exception e;
 
             if (gender == Gender::ignore)
             {
@@ -567,6 +622,17 @@ public:
                     goto nextWord;
                 };
             }
+
+            for (auto &exception : exceptions)
+            {
+                if (word.compare(exception.nominative) == 0)
+                {
+                    useException = true;
+                    e = exception;
+                    word = exception.stem;
+                    break;
+                }
+            }
             for (auto &entry : regexes)
             {
                 if (gender != Gender::ignore && entry.patern.gender != gender)
@@ -600,8 +666,16 @@ public:
                     inflectedWord.push_back(word);
 
                     auto prefix = word.substr(0, word.length() - full.length());
+                    int ncase = 2;
                     for (auto &pcase : entry.patern.cases)
                     {
+                        if (ncase == 4 && useException)
+                        {
+                            inflectedWord.push_back(e.accusative);
+                            ncase++;
+                            continue;
+                        }
+
                         std::string partial = prefix;
                         auto posSlash = pcase.find('/');
                         if (posSlash != std::string::npos)
@@ -627,6 +701,7 @@ public:
                         }
 
                         inflectedWord.push_back(partial.append(pcase));
+                        ncase++;
                     }
                     inflected.push_back(inflectedWord);
 
