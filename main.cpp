@@ -764,7 +764,7 @@ public:
                         {
                             if (animate)
                             {
-                                pcase = pcase.substr(posSlash);
+                                pcase = pcase.substr(posSlash + 1);
                             }
                             else
                             {
