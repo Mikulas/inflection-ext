@@ -324,6 +324,139 @@ private:
 
     };
 
+    const std::string forceM[81] = {
+        "alexej",
+        "aleš",
+        "alois",
+        "ambrož",
+        "ametyst",
+        "andrej",
+        "arest",
+        "azbest",
+        "bartoloměj",
+        "bruno",
+        "chlast",
+        "chřest",
+        "čaj",
+        "čaroďej",
+        "darmoďej",
+        "dešť",
+        "displej",
+        "dobroďej",
+        "drákula",
+        "ďeda",
+        "ďej",
+        "host",
+        "hranostaj",
+        "hugo",
+        "háj",
+        "ilja",
+        "ivo",
+        "jirka",
+        "jiří",
+        "kolega",
+        "koloďej",
+        "komoří",
+        "kontest",
+        "koň",
+        "kvido",
+        "kříž",
+        "lanýž",
+        "lukáš",
+        "maťej",
+        "mikoláš",
+        "mikuláš",
+        "mluvka",
+        "most",
+        "motorest",
+        "moula",
+        "muž",
+        "noe",
+        "ondřej",
+        "oto",
+        "otto",
+        "papež",
+        "pepa",
+        "peň",
+        "plast",
+        "podkoní",
+        "polda",
+        "prodej",
+        "protest",
+        "rest",
+        "saša",
+        "sleď",
+        "slouha",
+        "sluha",
+        "sprej",
+        "strejda",
+        "stupeň",
+        "sťežeň",
+        "šmoula",
+        "termoplast",
+        "test",
+        "tobiáš",
+        "tomáš",
+        "trest",
+        "táta",
+        "velmož",
+        "výdej",
+        "výprodej",
+        "vězeň",
+        "zeť",
+        "zloďej",
+        "žokej",
+    };
+
+    const std::string forceF[31] = {
+        "dagmar",
+        "dešť",
+        "digestoř",
+        "ester",
+        "kancelář",
+        "kleč",
+        "konzervatoř",
+        "koudel",
+        "koupel",
+        "křeč",
+        "maštal",
+        "miriam",
+        "neteř",
+        "obec",
+        "ocel",
+        "oratoř",
+        "otep",
+        "postel",
+        "prdel",
+        "rozkoš",
+        "řeč",
+        "sbeř",
+        "trofej",
+        "ves",
+        "výstroj",
+        "výzbroj",
+        "vš",
+        "zbroj",
+        "zteč",
+        "zvěř",
+        "závěj",
+    };
+
+    const std::string forceS[11] = {
+        "house",
+        "kuře",
+        "kůzle",
+        "nemluvňe",
+        "osle",
+        "prase",
+        "sele",
+        "slůně",
+        "tele",
+        "vejce",
+        "zvíře",
+    };
+
+
     std::vector<RegexPattern> regexes;
     std::vector<Pattern> dictionary;
 
@@ -389,6 +522,35 @@ public:
             std::string full;
             std::string glyph[3];
 
+            if (gender == Gender::ignore)
+            {
+                for (auto &entry : forceM)
+                {
+                    if (word.compare(entry) == 0)
+                    {
+                        gender = Gender::M;
+                        goto match;
+                    }
+                }
+                for (auto &entry : forceF)
+                {
+                    if (word.compare(entry) == 0)
+                    {
+                        gender = Gender::F;
+                        goto match;
+                    }
+                }
+                for (auto &entry : forceS)
+                {
+                    if (word.compare(entry) == 0)
+                    {
+                        gender = Gender::S;
+                        goto match;
+                    }
+                }
+            }
+
+            match:
             for (auto &entry : dictionary)
             {
                 if ((gender == Gender::ignore || entry.gender == gender) && word.compare(entry.regex) == 0)
