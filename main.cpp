@@ -795,6 +795,11 @@ public:
                 }
             }
 
+            inflected.push_back(std::vector<std::string> {
+                word, word, word, word, word, word, word,
+                word, word, word, word, word, word, word
+            });
+
             nextWord:
             continue;
         }
