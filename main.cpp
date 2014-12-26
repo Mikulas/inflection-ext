@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <pcrecpp.h>
+#include <algorithm>
 
 enum class Gender { M, F, S, ignore }; // masculine, feminine, neuter
 
@@ -536,7 +537,8 @@ public:
 
     virtual ~Inflection() {}
 
-    std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
+    {
         std::stringstream ss(s);
         std::string item;
         while (std::getline(ss, item, delim)) {
@@ -545,10 +547,91 @@ public:
         return elems;
     }
 
-    std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> split(const std::string &s, char delim)
+    {
         std::vector<std::string> elems;
         split(s, delim, elems);
         return elems;
+    }
+
+    void breakString(std::string input)
+    {
+        unsigned long pos;
+        pos = input.find("di");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ďi");
+        }
+
+        pos = input.find("ti");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ťi");
+        }
+
+        pos = input.find("ni");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ňi");
+        }
+
+        pos = input.find("dě");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ďe");
+        }
+
+        pos = input.find("tě");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ťě");
+        }
+
+        pos = input.find("ně");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ňe");
+        }
+    }
+
+    void fixString(std::string input)
+    {
+        unsigned long pos;
+        pos = input.find("ďi");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "di");
+        }
+
+        pos = input.find("ťi");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ti");
+        }
+
+        pos = input.find("ňi");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ni");
+        }
+
+        pos = input.find("ďe");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "dě");
+        }
+
+        pos = input.find("ťe");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "tě");
+        }
+
+        pos = input.find("ňe");
+        if (pos != std::string::npos)
+        {
+            input.replace(pos, 2, "ně");
+        }
     }
 
     /**
@@ -557,6 +640,9 @@ public:
      */
     Php::Value inflect(Php::Parameters &params)
     {
+        std::string input = params[0];
+        breakString(input);
+
         std::vector<std::string> words = split(params[0], ' ');
         std::reverse(words.begin(), words.end());
 
@@ -733,6 +819,7 @@ public:
                 separate = true;
             }
 
+            fixString(inflectedPhrase);
             result[ncase] = inflectedPhrase;
         }
 
