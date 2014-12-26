@@ -23,19 +23,23 @@ public:
     Php::Value inflect(Php::Parameters &params)
     {
         string phrase = params[0];
-        
-        int i;
-        string s;
+        string glyph;
        
-        pcrecpp::RE re("(\\w+):(\\d+)");
+        Php::out << "matching on '" << phrase << "'\n";
+
+        pcrecpp::RE_Options opt(PCRE_UTF8);
+        pcrecpp::RE re(">(.)<", opt);
         if (re.error().length() > 0) {
             Php::out << "PCRE compilation failed with error: " << re.error() << "\n";
         }
-        if (re.PartialMatch(phrase, &s, &i))
-        Php::out << "re match: " << s << " : " << i << "\n";
 
-        Php::out << phrase << std::endl;
+        if (re.PartialMatch(phrase, &glyph)) {
+            Php::out << "re match: " << glyph << "\n";
+        } else {
+            Php::out << "\033[31;mre not matched\033[m\n";
+        }
 
+        Php::out.flush();
         return ++_value;
     }
     
