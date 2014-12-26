@@ -381,6 +381,8 @@ public:
             animate = params[1]; // TODO cast properly
         }
 
+        Gender gender = Gender::ignore;
+
         for (auto &word : words)
         {
             Php::out << "Matching word: " << word << "\n";
@@ -389,17 +391,27 @@ public:
 
             for (auto &entry : dictionary)
             {
-                if (word.compare(entry.regex) == 0)
+                if ((gender == Gender::ignore || entry.gender == gender) && word.compare(entry.regex) == 0)
                 {
                     std::vector<std::string> inflectedWord {word};
                     inflectedWord.insert(inflectedWord.end(), entry.cases, entry.cases + sizeof(entry.cases) / sizeof(entry.cases[0]));
                     inflected.push_back(inflectedWord);
                     Php::out << "matched word on dictionary: " << word << " -> " << entry.cases[5] << "\n";
+
+                    if (gender == Gender::ignore)
+                    {
+                        gender = entry.gender;
+                    }
                     goto nextWord;
                 };
             }
             for (auto &entry : regexes)
             {
+                if (gender != Gender::ignore && entry.patern.gender != gender)
+                {
+                    continue;
+                }
+
                 bool found;
                 const int glyphs = entry.regex.NumberOfCapturingGroups();
                 switch (glyphs)
@@ -455,6 +467,11 @@ public:
                         inflectedWord.push_back(partial.append(pcase));
                     }
                     inflected.push_back(inflectedWord);
+
+                    if (gender == Gender::ignore)
+                    {
+                        gender = entry.patern.gender;
+                    }
                     goto nextWord;
                 }
             }
